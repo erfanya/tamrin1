@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/c/Users/SS-Captain/Desktop/tamrin1/src/main.cpp
+iostream
+-
+iomanip
+-
+cstdlib
+-
+string
+-
+vector
+-
+algorithm
+-
+
