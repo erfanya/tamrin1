@@ -5,7 +5,6 @@
 #include <vector>
 #include <algorithm>
 
-
 using namespace std;
 
 typedef struct matrix Matrix;
@@ -17,18 +16,16 @@ struct matrix
     vector<vector<int>> matris;//2nd vector
 };
 
-
-
 void help();
-void add_matrix(string & command, vector<Matrix> & mat);
+void add_matrix(string command, vector<Matrix> & mat);
 void is_diagonal(const string & command, vector<Matrix> & mat);
 void is_upper_triangular(const string & command, vector<Matrix> & mat);
-void is_lower_triangular(string & command, vector<Matrix> & mat);
-void is_triangular(string & command, vector<Matrix> & mat);
-void is_identtity(string & command, vector<Matrix> & mat);
-void is_normal_symmetric(string & command, vector<Matrix> & mat);
-void is_skew_symmetric(string & command, vector<Matrix> & mat);
-void is_symmetric(string & command, vector<Matrix> & mat);
+void is_lower_triangular(const string & command, vector<Matrix> & mat);
+void is_triangular(const string & command, vector<Matrix> & mat);
+void is_identtity(const string & command, vector<Matrix> & mat);
+void is_normal_symmetric(const string & command, vector<Matrix> & mat);
+void is_skew_symmetric(const string & command, vector<Matrix> & mat);
+void is_symmetric(const string & command, vector<Matrix> & mat);
 void inverse(string & command, vector<Matrix> & mat);
 void show(const string & command, vector<Matrix> & mat);
 void deletee(string & command, vector<Matrix> & mat);
@@ -36,62 +33,112 @@ void change(string & command, vector<Matrix> & mat);
 int find_matrix_index(const string & name, vector<Matrix> & mat);
 string find_name(const string & command);
 
-void add_matrix(string & command, vector<Matrix> & mat)//baraye ezafe kardan matris
+void add_matrix(string command, vector<Matrix> & mat)//baraye ezafe kardan matris
 {   
     struct matrix temp;
 
-    int pos = command.find(" ");
-    string temp_command = command.substr(0, pos);
-
-    int pos2 = command.find(" ", pos + 1);
-    string name_mat = command.substr(pos, pos2 - pos);
-
-    temp.name = name_mat;
-
-    int row = command[pos2 + 1] - 48;
-
-    int col = row;
-  
-    if (command[pos2 + 4] == ' ')
+    if (command == "add_matrix")
     {
-        col = command[pos2 + 3] - 48;
-    }
+        int row, col;
+        string name_mat;
 
-    command = command.substr(pos2 + 5);
-  
-    int temp_mat[row][col];
+        cout << "Enter a name : ";
+        cin >> name_mat;
+        temp.name = name_mat;
 
-    for(int i = 0; command != "" && i < row; i++)
-    {
-        temp.matris.push_back(vector<int>());
-    
-        for(int j = 0; command != "" && j < col; j++)
-        {
-            temp.matris[i].push_back(command[0] - 48);
-           
-            if(command.size() <= 2)
-            {          
-                mat.push_back(temp);
-                break;
+        cout << "Enter rows : ";
+        cin >> row;
+
+        cout << "Enter columns : ";
+        cin >> col;
+
+        int temp_num;
+        
+        if (row > 0 && col > 0)
+        { 
+            for(int i = 0; i < row; i++)
+            {
+                temp.matris.push_back(vector<int>());
+            
+                for(int j = 0; j < col; j++)
+                {
+                    cout << "Enter row[" << i+1 << "] , col[" << j+1 << "] : ";
+                    cin >> temp_num;
+                    temp.matris[i].push_back(temp_num);          
+                }    
             }
-            command = command.substr(command.find(',') + 1);
+            cout << "Matrix Added" << endl;
+        }
+        else if (row < 0 || col < 0)
+        {
+            cout << "You cant add a matrix with invalid row or column" << endl;
         }
     }
+    else
+    {
+        int pos = command.find(" ");
+        int pos2 = command.find(" ", pos + 1);
+        
+        string name_mat = command.substr(pos, pos2 - pos);
+
+        temp.name = name_mat;
+
+        int pos3 =  command.find(" ", pos2 + 1);
+        int row = stoi(command.substr(pos2, pos3 - pos2));
+
+        int col = row;
+
+        if (row < 0 || col < 0)
+        {
+            cout << "You cant add a matrix with invalid row or column" << endl;
+            
+        }
+
+        if(command.find(",", pos3 + 1) > command.find(" ", pos3 + 1)) // if input col
+        {
+            col = stoi(command.substr(pos3 + 1, command.find(" ", pos3 + 1) - pos3));
+        
+            command = command.substr(command.find(" ", pos3 + 1) + 1);
+        }
+        else
+        {
+           command = command.substr(pos3 + 1);
+        }
     
-    cout << "Matrix Added" << endl;
+        for(int i = 0; command != "" && i < row; i++)
+        {
+            temp.matris.push_back(vector<int>());
+        
+            for(int j = 0; command != "" && j < col; j++)
+            {
+                temp.matris[i].push_back(stoi(command.substr(0, command.find(","))));
+            
+                if(command.find(",") == string::npos)
+                {          
+                    mat.push_back(temp);
+                    break;
+                }
+                command = command.substr(command.find(',') + 1);
+            }
+        }
+        if (row > 0 && col > 0)
+        {
+            cout << "Matrix Added" << endl;
+        }    
+    }
 }
 
-void is_diagonal(const string & command, vector<Matrix> & mat)//baraye moshakhas kardan ghotri boodan matris 
+void is_diagonal(const string & command, vector<Matrix> & mat)//baraye moshakhas kardan ghotri boodan matris   
 {   
-    string name_mat = find_name(command);
+    string name_mat = find_name(command);// peyda kardan esm matris
 
-    int index = find_matrix_index(name_mat,  mat);
+    int index = find_matrix_index(name_mat,  mat); // peyda kardan khoone matrisi ke ba esm hamkhooni dare 
 
-    int flag = 0;
+    int flag = 1; 
    
-    if (index == -1)
+    if (index == -1)//esm vared shode eshtebahe ya matrix add nashode
     {
-        cout << "matrix doesnt found!" << endl;
+        cout << "matrix not found!" << endl;
     }
     if (index > -1)
     {      
@@ -99,176 +146,176 @@ void is_diagonal(const string & command, vector<Matrix> & mat)//baraye moshakhas
         {
             for (int j = 0; j < mat[index].matris[i].size(); j++)
             {
-                if ((i != j) && (mat[index].matris[i][j] != 0))
-                {
-                    flag = 1;
+                if (i != j)
+                { 
+                    if((mat[index].matris[i][j] != 0))// shart ghotri naboodan
+                    {
+                        flag = 0;// ghotri nist
+                    }
                 }
             }
         }
-    }
+    }   
     
-    if (flag == 0)
-    {
-        cout << "Its Diagonal" << endl;
-    }
     if (flag == 1)
     {
-        cout << "Its not Diagonal" << endl;
+        cout << "YES" << endl;
+    }
+    if (flag == 0)
+    {
+        cout << "NO" << endl;
     }
 }
 
 void is_upper_triangular(const string & command, vector<Matrix> & mat)//baraye moshakhas kardan bala mosalasi boodan matris
 {    
-    string name_mat = find_name(command);
+    string name_mat = find_name(command);// peyda kardan esm matrix
     
-    int index = find_matrix_index(name_mat,  mat);
+    int index = find_matrix_index(name_mat,  mat); // peyda kardan khoone matrisi ke ba esm hamkhooni dare
 
-    int flag = 0;
+    int flag = 1;
    
     if (index == -1)
     {
-        cout << "matrix doesnt found!" << endl;
+        cout << "matrix not found!" << endl;
     }
     if (index > -1)
     {      
-        for (int i = 0; i < mat[index].matris.size(); i++)
+        for(int i = 0; i < mat[index].matris.size(); i++)
         {
-            for (int j = 0; j < mat[index].matris[i].size(); j++)
+            for(int j = 0; j < mat[index].matris.size(); j++)
             {
-                if ((mat[index].matris[i][j] != 0))
+                if(j > i)
                 {
-                    flag = 1;
-                }
-            }
-        }
-    }
-    
-    if (flag == 0)
-    {
-        cout << "Its upper triangular" << endl;
-    }
-    if (flag == 1)
-    {
-        cout << "Its not upper triangular" << endl;
-    }
-}
-
-void is_lower_triangular(string & command, vector<Matrix> & mat)//baraye moshakhas kardan payeen mosalasi boodan matris
-{
-    /*  for (int i = 0; i < row; i++)
-        {
-            for (int j = i + 1; j < col; j++)
-            {
-                if (mat[i][j] != 0)
-                {
-                    return false;
+                    if(mat[index].matris[i][j] != 0)// check kardan bala mosalasi boodan
+                    {
+                        flag = 0;// bala mosalasi nist
+                    }
                 }
             }
         }    
-    
-    */
-    string name_mat = find_name(command);
-    
-    int index = find_matrix_index(name_mat,  mat);
 
-    int flag = 0;
-   
-    if (index == -1)
-    {
-        cout << "matrix doesnt found!" << endl;
-    }
-    if (index > -1)
-    {      
-        for (int i = 0; i < mat[index].matris.size(); i++)
-        {
-            for (int j = 0; j < mat[index].matris[i].size(); j++)
-            {
-                if ((mat[index].matris[i][j] != 0))
-                {
-                    flag = 1;
-                }
-            }
-        }
-    }
-    
-    if (flag == 0)
-    {
-        cout << "Its lower triangular" << endl;
-    }
-    if (flag == 1)
-    {
-        cout << "Its not lower triangular" << endl;
-    }
-    
-}
-
-void is_triangular(string & command, vector<Matrix> & mat)//baraye moshakhas kardan mosalasi boodan matris
-{
-    int pos = command.find("");
-    string temp_command = command.substr(0, pos);
-
-    int pos2 = command.find("", pos+1);
-    string name = command.substr(pos, pos2 - pos);
-
-    int flag = 0;
-
-    //if ( row != col)
-    //{
-    //    return false;
-    //}
-
-    /*  for (int i = 1; i < row; i++)
-        {
-            for (int j = 0; j < i; j++)
-            {
-                if (mat[i][j] != 0)
-                {
-                    flag = 0;
-                }
-                else 
-                {
-                    flag = 1;
-                }
-            }
-        }
-
-        for (int i = 0; i < row; i++)
-        {
-            for (int j = i + 1; j < col; j++)
-            {
-                if (mat[i][j] != 0)
-                {
-                    flag = 0;
-                }
-                else
-                {
-                    flag = 1;
-                }
-            }
-        }    
         if (flag == 1)
         {
             cout << "YES" << endl;
         }
-        else if (flag == 0)
+        if (flag == 0)
         {
             cout << "NO" << endl;
-        }    
-    */
+        }
+    }
 
 }
 
-void is_identtity(string & command, vector<Matrix> & mat)//baraye moshakhas kardan hamani ya hamooni boodan matris
+void is_lower_triangular(const string & command, vector<Matrix> & mat)//baraye moshakhas kardan payeen mosalasi boodan matris
 {
-    string name_mat = find_name(command);
+    string name_mat = find_name(command);// peyda kardan esm matrix
+    
+    int index = find_matrix_index(name_mat,  mat); // peyda kardan khoone matrisi ke ba esm hamkhooni dare
 
-    int index = find_matrix_index(name_mat,  mat);
-
-    int flag = 0;
+    int flag = 1;
    
     if (index == -1)
     {
-        cout << "matrix doesnt found!" << endl;
+        cout << "matrix not found!" << endl;
+    }
+    if (index > -1)
+    {      
+        for(int i = 0; i < mat[index].matris.size(); i++)
+        {
+            for(int j = 0; j < mat[index].matris.size(); j++)
+            {
+                if(j < i)
+                {
+                    if(mat[index].matris[i][j] != 0)// check kardan payeen mosalasi boodan
+                    {
+                        flag = 0;// payeen mosalasi nist
+                    }
+                }
+            }
+        }    
+
+        if (flag == 1)
+        {
+            cout << "YES" << endl;
+        }
+        if (flag == 0)
+        {
+            cout << "NO" << endl;
+        }
+    }
+}
+
+void is_triangular(const string & command, vector<Matrix> & mat)//baraye moshakhas kardan mosalasi boodan matris
+{
+    string name_mat = find_name(command);// peyda kardan esm matrix
+    
+    int index = find_matrix_index(name_mat,  mat);// peyda kardan khoone matrisi ke ba esm hamkhooni dare
+
+    int flag1 = 1;// jahat check kardan bala mosalasi boodan
+    int flag2 = 1;// jahat check kardan payeen mosalasi boodan
+
+    if (index == -1)
+    {
+        cout << "matrix not found!" << endl;
+    }
+    if (index > -1)
+    {      
+        for(int i = 0; i < mat[index].matris.size(); i++)
+        {
+            for(int j = 0; j < mat[index].matris.size(); j++)
+            {
+                if(j > i)
+                {
+                    if(mat[index].matris[i][j] != 0)// check kardan bala mosalasi boodan
+                    {
+                        flag1 = 0;// bala mosalasi nist
+                    }
+                }
+            }
+        } 
+
+            
+        for(int i = 0; i < mat[index].matris.size(); i++)
+        {
+            for(int j = 0; j < mat[index].matris.size(); j++)
+            {
+                if(j < i)
+                {
+                    if(mat[index].matris[i][j] != 0)// check kardan payeen mosalasi boodan
+                    {
+                        flag2 = 0;// payeen mosalasi nist
+                    }
+                }
+            }
+        }       
+
+        if (flag1 == 1)
+        {
+            cout << "YES --> Upper Triangular" << endl;
+        }
+        if (flag2 == 1)
+        {
+            cout << "YES --> Lower Triangular" << endl;
+        }
+        else if (flag1 == 0 && flag2 == 0)
+        {
+            cout << "NO" << endl;
+        }
+    }
+}
+
+void is_identtity(const string & command, vector<Matrix> & mat)//baraye moshakhas kardan hamani ya hamooni boodan matris
+{
+    string name_mat = find_name(command);//peyda kardan esm matrix
+
+    int index = find_matrix_index(name_mat,  mat);// peyda kardan khoone matrisi ke ba esm hamkhooni dare
+
+    int flag = 1;//jahat check kardan ghotri boodan
+   
+    if (index == -1)
+    {
+        cout << "matrix not found!" << endl;
     }
     if (index > -1)
     {      
@@ -276,54 +323,62 @@ void is_identtity(string & command, vector<Matrix> & mat)//baraye moshakhas kard
         {
             for (int j = 0; j < mat[index].matris[i].size(); j++)
             {
-                if ((i != j) && (mat[index].matris[i][j] != 0))
+                if (i != j )
                 {
-                    flag = 1;
+                    if ((mat[index].matris[i][j] != 0))//check kardan ghotri boodan
+                    {
+                        flag = 0;
+                    }
                 }
             }
         }
-    }
+
     
-    if (flag == 0)
-    {   
-        int flag1 = 0;
+        if (flag == 1)// age ghotri bood vared inja mishe
+        {   
+            int flag1 = 1;//check kardan hamani boodan
 
-        for (int i = 0; i < mat[index].matris.size(); i++)
-        {
-            for (int j = 0; j < mat[index].matris[i].size(); j++)
+            for (int i = 0; i < mat[index].matris.size(); i++)
             {
-                if (mat[index].matris[i][j] != mat[index].matris[i+1][j+1])
-                {
-                    flag1 = 1;
+                for (int j = 0; j < mat[index].matris[i].size(); j++)
+                {   
+                    if (i-1 == j-1)
+                    {
+                        if (mat[index].matris[i ][j] == 1 && mat[index].matris[i+1][j+1] == 1) ////////////////****************
+                        {
+                            flag1 = 0;
+                        }
+                    }
                 }
             }
+
+            if (flag1 == 1)
+            {
+                cout << "YES" << endl;
+            }
+            if (flag1 == 0)
+            {
+                cout << "NO" << endl;
+            }
         }
-        if (flag1 == 0)
+        if (flag == 0)
         {
-            cout << "Its Identtity" << endl;
+            cout << "NO" << endl;
         }
-        if (flag1 == 1)
-        {
-            cout << "Its not Identtity" << endl;
-        }
-    }
-    if (flag == 1)
-    {
-        cout << "Its not Identtity" << endl;
     }
 }
 
-void is_normal_symmetric(string & command, vector<Matrix> & mat)//baraye moshakhas kardan motegharen boodan matris
+void is_normal_symmetric(const string & command, vector<Matrix> & mat)//baraye moshakhas kardan motegharen boodan matris
 {
-    string name_mat = find_name(command);
+    string name_mat = find_name(command);// peyda kardan esm matrix
 
-    int index = find_matrix_index(name_mat,  mat);
+    int index = find_matrix_index(name_mat,  mat);// peyda kardan khoone matrisi ke ba esm hamkhooni dare
 
-    int flag = 0;
+    int flag = 1;
    
     if (index == -1)
     {
-        cout << "matrix doesnt found!" << endl;
+        cout << "matrix not found!" << endl;
     }
     if (index > -1)
     {
@@ -331,34 +386,34 @@ void is_normal_symmetric(string & command, vector<Matrix> & mat)//baraye moshakh
         {
             for (int j = 0; j < mat[index].matris[i].size(); j++)
             {
-                if ((mat[index].matris[i][j] != mat[index].matris[j][i]))
+                if ((mat[index].matris[i][j] != mat[index].matris[j][i]))//check kardan motegharen boodan
                 {
-                    flag = 1;
+                    flag = 0;//motegharen nist
                 }
             }
         }
     }   
-    if (flag == 0)
-    {
-        cout << "Its Normal Symmetric" << endl;
-    }
     if (flag == 1)
     {
-        cout << "Its not Normal Symmetric" << endl;
+        cout << "YES" << endl;
+    }
+    if (flag == 0)
+    {
+        cout << "NO" << endl;
     }
 }
 
-void is_skew_symmetric(string & command, vector<Matrix> & mat)//baraye moshakhas kardan padmotegharen boodan matris
+void is_skew_symmetric(const string & command, vector<Matrix> & mat)//baraye moshakhas kardan padmotegharen boodan matris
 {
-    string name_mat = find_name(command);
+    string name_mat = find_name(command);// peyda kardan esm matrix
 
-    int index = find_matrix_index(name_mat,  mat);
+    int index = find_matrix_index(name_mat,  mat);// peyda kardan khoone matrisi ke ba esm hamkhooni dare
 
-    int flag = 0;
+    int flag = 1;
    
     if (index == -1)
     {
-        cout << "matrix doesnt found!" << endl;
+        cout << "matrix not found!" << endl;
     }
     if (index > -1)
     {
@@ -366,34 +421,46 @@ void is_skew_symmetric(string & command, vector<Matrix> & mat)//baraye moshakhas
         {
             for (int j = 0; j < mat[index].matris[i].size(); j++)
             {
-                if ((mat[index].matris[i][j] == -(mat[index].matris[j][i])))
+                if (j > i)
                 {
-                    flag = 1;
+                    if ((mat[index].matris[j][i] != -(mat[index].matris[i][j])))// check kardan pad motegharn boodan
+                    {
+                        flag = 0;// pad motegharen nist
+                    }
+                }
+                if (j < i)
+                {
+                    if ((mat[index].matris[i][j] != -(mat[index].matris[j][i])))// check kardan pad motegharn boodan
+                    {
+                        flag = 0;// pad motegharen nist
+                    }
                 }
             }
         }
-    }   
-    if (flag == 0)
-    {
-        cout << "Its Skew Symmetric" << endl;
-    }
-    if (flag == 1)
-    {
-        cout << "Its not Skew Symmetric" << endl;
+       
+        if (flag == 1)
+        {
+            cout << "YES" << endl;
+        }
+        if (flag == 0)
+        {
+            cout << "NO" << endl;
+        }
     }    
 }
 
-void is_symmetric(string & command, vector<Matrix> & mat)//baraye moshakhas kardan motegharen boodan matris
+void is_symmetric(const string & command, vector<Matrix> & mat)//baraye moshakhas kardan motegharen boodan matris
 {
-     string name_mat = find_name(command);
+    string name_mat = find_name(command);// peyda kardan esm matrix
 
-    int index = find_matrix_index(name_mat,  mat);
+    int index = find_matrix_index(name_mat,  mat);// peyda kardan khoone matrisi ke ba esm hamkhooni dare
 
-    int flag1, flag2 = 0;
+    int flag1 = 1;
+    int flag2 = 1;
    
     if (index == -1)
     {
-        cout << "matrix doesnt found!" << endl;
+        cout << "matrix not found!" << endl;
     }
     if (index > -1)
     {
@@ -401,28 +468,46 @@ void is_symmetric(string & command, vector<Matrix> & mat)//baraye moshakhas kard
         {
             for (int j = 0; j < mat[index].matris[i].size(); j++)
             {
-                if ((mat[index].matris[i][j] != mat[index].matris[j][i]))
+                if ((mat[index].matris[i][j] != mat[index].matris[j][i]))//check kardan motegharen boodan
                 {
-                    flag1 = 1;
+                    flag1 = 0;//motegharen nist
                 }
-                else if((mat[index].matris[i][j] == -(mat[index].matris[j][i])))
+            }    
+        }
+
+        for (int i = 0; i < mat[index].matris.size(); i++)
+        {
+            for (int j = 0; j < mat[index].matris[i].size(); j++)
+            {
+                if (j > i)
                 {
-                    flag2 = 1;
+                    if ((mat[index].matris[j][i] != -(mat[index].matris[i][j])))// check kardan pad motegharn boodan
+                    {
+                        flag2 = 0;// pad motegharen nist
+                    }
+                }
+                if (j < i)
+                {
+                    if ((mat[index].matris[i][j] != -(mat[index].matris[j][i])))// check kardan pad motegharn boodan
+                    {
+                        flag2 = 0;// pad motegharen nist
+                    }
                 }
             }
+        }  
+        
+        if (flag1 == 1)
+        {
+            cout << "YES --> Normal Symmetric" << endl;
         }
-    }   
-    if (flag1 == 0)
-    {
-        cout << "Its Normal Symmetric" << endl;
-    }
-    if (flag2 == 0)
-    {
-        cout << "Its Skew Symmetric" << endl;
-    }
-    if (flag1 == 1 && flag2 == 1)
-    {
-        cout << "The matrix isnt symmetric." << endl;
+        if (flag2 == 1)
+        {
+            cout << "YES --> Skew Symmetric" << endl;
+        }
+        if (flag1 == 0 && flag2 == 0)
+        {
+            cout << "NO" << endl;
+        }
     }
 }
 
@@ -434,7 +519,7 @@ void inverse(string & command, vector<Matrix> & mat)//baraye makoos kardan matri
 void show(const string & command, vector<Matrix> & mat)//baraye namayesh matris
 {   
     string name_mat = find_name(command);
-
+    
     int index = find_matrix_index(name_mat,  mat);
     
     if (index == -1)
@@ -500,8 +585,6 @@ void change(string & command, vector<Matrix> & mat)//baraye viyraesh yek khoone 
 
     int index = find_matrix_index(name_mat, mat);
 
-    cout << command[0]-48 << index << name_mat << row << col << endl;    
-
     if (index == -1)
     {
         cout << "matrix doesnt found!" << endl;
@@ -514,7 +597,7 @@ void change(string & command, vector<Matrix> & mat)//baraye viyraesh yek khoone 
 
 }
 
-int find_matrix_index(const string & name, vector<Matrix> & mat)
+int find_matrix_index(const string & name, vector<Matrix> & mat)// peyda kardan khoone matrisi ke ba esm hamkhooni dare
 {   
     for (size_t i = 0; i < mat.size(); i++)
     {
@@ -526,14 +609,13 @@ int find_matrix_index(const string & name, vector<Matrix> & mat)
     return -1;
 }
 
-string find_name(const string & command)
+string find_name(const string & command)// peyda kardan esm matrix
 {
     int pos = command.find(" ");
-    string temp_command = command.substr(0, pos);
-
     int pos2 = command.find(" ", pos + 1);
+    
     string name_mat = command.substr(pos, pos2 - pos);
-
+    
     return name_mat;
 }
 
@@ -550,7 +632,7 @@ int main()
 
         for (size_t i = 0; i < command.length(); i++)
         {
-        command[i] = tolower(command[i]);
+            command[i] = tolower(command[i]);
         }
     
         string check = command.substr(0, command.find(" "));
