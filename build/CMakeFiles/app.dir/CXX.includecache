@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/mnt/c/Users/SS-Captain/Desktop/tamrin1/src/main.cpp
+../header/header.hpp
 iostream
 -
 iomanip
@@ -18,5 +18,11 @@ string
 vector
 -
 algorithm
+-
+
+/mnt/c/Users/SS-Captain/Desktop/tamrin1/src/main.cpp
+iostream
+-
+header.hpp
 -
 
