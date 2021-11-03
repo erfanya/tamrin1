@@ -16,103 +16,81 @@ struct matrix
     vector<vector<int>> matris;//2nd vector
 };
 
-string find_name(const string & command);
-int find_matrix_index(const string & name, vector<Matrix> & mat);
+int find_matrix_index(const string & name, vector<Matrix> & mat)// peyda kardan khoone matrisi ke ba esm hamkhooni dare
+{   
+    for (size_t i = 0; i < mat.size(); i++)
+    {
+        if (mat[i].name == name)// peyda kardan esm matrs
+        {
+            return i;// bargardoondan khoone e az vector ke matris dakhelesh zakhire shode
+        }
+    }
+    cout << "matrix not found!" << endl;
+    return -1;// age esm peyda nashe -1 barmigarde ke neshoone vojod nashtane matrise
+}
 
+string find_name(const string & command)// peyda kardan esm matrix
+{
+    int pos = command.find(" ");// avalin space 
+    int pos2 = command.find(" ", pos + 1);// dovomin space bad az avalin space
+    
+    string name_mat = command.substr(pos, pos2 - pos);// esm = harchiz beyn 2 space 
+    
+    return name_mat;
+}
 
 void add_matrix(string command, vector<Matrix> & mat)//baraye ezafe kardan matris
 {   
     struct matrix temp; 
 
-    if (command == "add_matrix") // ravesh aval gereftan matris
-    {
-        int row, col;
-        string name_mat;
-
-        cout << "Enter a name : ";
-        cin >> name_mat;
-
-        temp.name = name_mat; // gereftan va zakhire kardan name
-
-        cout << "Enter rows : ";
-        cin >> row; // gereftan satr
-
-        cout << "Enter columns : ";
-        cin >> col; // gereftan sootoon
-
-        int temp_num;
-        
-        if (row > 0 && col > 0)
-        { 
-            for(int i = 0; i < row; i++)
-            {
-                temp.matris.push_back(vector<int>());
-            
-                for(int j = 0; j < col; j++)
-                {
-                    cout << "Enter row[" << i+1 << "] , col[" << j+1 << "] : ";
-                    cin >> temp_num;
-                    temp.matris[i].push_back(temp_num);          
-                }    
-            }
-            cout << "Matrix Added" << endl;
-        }
-        else if (row < 0 || col < 0)
-        {
-            cout << "You cant add a matrix with invalid row or column" << endl;
-        }
-    }
-    else // ravesh dovom gereftan matris
-    {
-        int pos = command.find(" ");// peyda kardan avalim space 
-        int pos2 = command.find(" ", pos + 1); // peyda kardan dovomin space nesbat be space aval
-        
-        string name_mat = command.substr(pos, pos2 - pos); // name = harchiz beyn space 2 - space 1
-
-        temp.name = name_mat;// save kardan name dakhel struct
-
-        int pos3 =  command.find(" ", pos2 + 1);// peyda kardan sevomin space nesbat be space 2
-        int row = stoi(command.substr(pos2, pos3 - pos2)); // row = spcae 3 = space 2 
-
-        int col = row; // col = row (by default)
-
-        if (row < 0 || col < 0)
-        {
-            cout << "You cant add a matrix with invalid row or column" << endl;
-        }
-
-        if(command.find(",", pos3 + 1) > command.find(" ", pos3 + 1)) // if input col
-        {
-            col = stoi(command.substr(pos3 + 1, command.find(" ", pos3 + 1) - pos3));// peyda kardan sootoon 
-        
-            command = command.substr(command.find(" ", pos3 + 1) + 1);// element ha
-        }
-        else
-        {
-           command = command.substr(pos3 + 1);// element ha 
-        }
     
-        for(int i = 0; command != "" && i < row; i++)
-        {
-            temp.matris.push_back(vector<int>());
+    int pos = command.find(" ");// peyda kardan avalim space 
+    int pos2 = command.find(" ", pos + 1); // peyda kardan dovomin space nesbat be space aval
         
-            for(int j = 0; command != "" && j < col; j++)
-            {
-                temp.matris[i].push_back(stoi(command.substr(0, command.find(","))));
-            
-                if(command.find(",") == string::npos)
-                {          
-                    mat.push_back(temp);
-                    break;
-                }
-                command = command.substr(command.find(',') + 1);
-            }
-        }
-        if (row > 0 && col > 0)
-        {
-            cout << "Matrix Added" << endl;
-        }    
+    string name_mat = command.substr(pos, pos2 - pos); // name = harchiz beyn space 2 - space 1
+    temp.name = name_mat;// save kardan name dakhel struct
+
+    int pos3 =  command.find(" ", pos2 + 1);// peyda kardan sevomin space nesbat be space 2
+    int row = stoi(command.substr(pos2, pos3 - pos2)); // row = spcae 3 = space 2 
+
+    int col = row; // col = row (by default)
+
+    if (row < 0 || col < 0)
+    {
+        cout << "You cant add a matrix with invalid row or column" << endl;
     }
+
+    if(command.find(",", pos3 + 1) > command.find(" ", pos3 + 1)) // if input col
+    {
+        col = stoi(command.substr(pos3 + 1, command.find(" ", pos3 + 1) - pos3));// peyda kardan sootoon 
+        
+        command = command.substr(command.find(" ", pos3 + 1) + 1);// element ha
+    }
+    else
+    {
+        command = command.substr(pos3 + 1);// element ha 
+    }
+
+    for(int i = 0; command != "" && i < row; i++)
+    {
+        temp.matris.push_back(vector<int>());
+        
+        for(int j = 0; command != "" && j < col; j++)
+        {
+            temp.matris[i].push_back(stoi(command.substr(0, command.find(","))));
+            
+            if(command.find(",") == string::npos)
+            {          
+                mat.push_back(temp);
+                break;
+            }
+            command = command.substr(command.find(',') + 1);
+        }
+    }
+    if (row > 0 && col > 0)
+    {
+        cout << "Matrix Added" << endl;
+    }    
 }
 
 bool is_diagonal(const string & command, vector<Matrix> & mat)//baraye moshakhas kardan ghotri boodan matris   
@@ -442,29 +420,6 @@ void change(string & command, vector<Matrix> & mat)//baraye viyraesh yek khoone 
         cout << "Change was successful" << endl;
         }
     }
-}
-
-int find_matrix_index(const string & name, vector<Matrix> & mat)// peyda kardan khoone matrisi ke ba esm hamkhooni dare
-{   
-    for (size_t i = 0; i < mat.size(); i++)
-    {
-        if (mat[i].name == name)// peyda kardan esm matrs
-        {
-            return i;// bargardoondan khoone e az vector ke matris dakhelesh zakhire shode
-        }
-    }
-    cout << "matrix not found!" << endl;
-    return -1;// age esm peyda nashe -1 barmigarde ke neshoone vojod nashtane matrise
-}
-
-string find_name(const string & command)// peyda kardan esm matrix
-{
-    int pos = command.find(" ");// avalin space 
-    int pos2 = command.find(" ", pos + 1);// dovomin space bad az avalin space
-    
-    string name_mat = command.substr(pos, pos2 - pos);// esm = harchiz beyn 2 space 
-    
-    return name_mat;
 }
 
 void help()//baraye komak be karbar va modiriyat barname
